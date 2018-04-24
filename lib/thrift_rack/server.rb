@@ -42,5 +42,3 @@ class ThriftRack
     end
   end
 end
-
-require_relative "./user_server"
