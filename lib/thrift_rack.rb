@@ -1,8 +1,10 @@
 require "thrift_rack/version"
 require "thrift_rack/server"
+require 'thrift_rack/ping'
+require 'thrift_rack/format_check'
+
 require 'rack'
 require 'thrift'
-
 
 class ThriftRack
   THRIFT_HEADER = "application/x-thrift"
@@ -17,10 +19,6 @@ class ThriftRack
 
   def call(env)
     req = Rack::Request.new(env)
-    return Rack::Response.new(["PONG"], 200, {'Content-Type' => 'text/plain'}) if req.path == "/ping"
-
-    return Rack::Response.new(["Not Valid Thrift Request"], 400, {'Content-Type' => 'text/plain'}) unless req.post? && req.env["CONTENT_TYPE"] == THRIFT_HEADER
-
     server_class = @maps[req.path]
     return Rack::Response.new(["No Thrift Server For #{req.path}"], 404, {'Content-Type' => 'text/plain'}) unless server_class
 
@@ -35,9 +33,8 @@ class ThriftRack
 
   def self.app(servers = nil)
     Rack::Builder.new(ThriftRack.new(servers)) do
-      use Rack::CommonLogger
-      use Rack::ShowExceptions
-      use Rack::Lint
+      use ThriftRack::Ping
+      use ThriftRack::FormatCheck
     end
   end
 end
