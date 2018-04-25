@@ -3,14 +3,11 @@ require 'securerandom'
 class ThriftRack
   class Client
     def initialize(url, client_klass, request_id)
-      @rpc_id = SecureRandom.uuid
-      @request_id = request_id
+      @request_id = request_id || "no-request"
       @url = url
       @transport = Thrift::HTTPClientTransport.new(url, ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)
-      @transport.add_headers({"X-Request-ID" => @request_id || "no-request", "X-Rpc-ID" => @rpc_id})
       protocol = protocol_factory.get_protocol(@transport)
       @client = client_klass.new(protocol)
-
     end
 
     def logger
@@ -26,15 +23,16 @@ class ThriftRack
       self.class_eval do
         define_method method.to_sym do |*args|
           begin
+            rpc_id = SecureRandom.uuid
             request_at = Time.now
-            @transport.add_headers({"X-Rpc-Func" => method.to_s})
+            @transport.add_headers({"X-Request-ID" => @request_id, "X-Rpc-ID" => rpc_id, "X-Rpc-Func" => method.to_s})
             @client.send(method, *args)
           ensure
             end_time = Time.now
             self.logger.info(JSON.dump({
               request_at: request_at.iso8601,
               request_id: @request_id,
-              rpc_id: @rpc_id,
+              rpc_id: rpc_id,
               duration: ((end_time - request_at) * 1000).round(4),
               path: URI(@url).path,
               func: method,
