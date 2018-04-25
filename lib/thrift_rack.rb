@@ -1,6 +1,7 @@
 require "thrift_rack/version"
 require "thrift_rack/server"
 require "thrift_rack/logger"
+require "thrift_rack/client"
 require 'thrift_rack/ping'
 require 'thrift_rack/format_check'
 
