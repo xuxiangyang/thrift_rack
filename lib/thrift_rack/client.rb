@@ -7,7 +7,7 @@ class ThriftRack
       @request_id = request_id
       @url = url
       @transport = Thrift::HTTPClientTransport.new(url, ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)
-      @transport.add_headers({"X-Request-ID" => @request_id, "X-Rpc-ID" => @rpc_id})
+      @transport.add_headers({"X-Request-ID" => @request_id || "no-request", "X-Rpc-ID" => @rpc_id})
       protocol = protocol_factory.get_protocol(@transport)
       @client = client_klass.new(protocol)
 
