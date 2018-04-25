@@ -1,5 +1,6 @@
 require "thrift_rack/version"
 require "thrift_rack/server"
+require "thrift_rack/logger"
 require 'thrift_rack/ping'
 require 'thrift_rack/format_check'
 
@@ -35,6 +36,7 @@ class ThriftRack
     Rack::Builder.new(ThriftRack.new(servers)) do
       use ThriftRack::Ping
       use ThriftRack::FormatCheck
+      use ThriftRack::Logger
     end
   end
 end
