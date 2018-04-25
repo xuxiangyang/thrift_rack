@@ -14,7 +14,7 @@ class ThriftRack
     ensure
       end_time = Time.now
       self.logger.info(JSON.dump({
-        request_at: request_at.iso8601,
+        request_at: request_at.iso8601(6),
         request_id: req.env["HTTP_X_REQUEST_ID"],
         rpc_id: req.env["HTTP_X_RPC_ID"],
         duration: ((end_time - request_at) * 1000).round(4),

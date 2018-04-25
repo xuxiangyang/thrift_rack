@@ -30,7 +30,7 @@ class ThriftRack
           ensure
             end_time = Time.now
             self.logger.info(JSON.dump({
-              request_at: request_at.iso8601,
+              request_at: request_at.iso8601(6),
               request_id: @request_id,
               rpc_id: rpc_id,
               duration: ((end_time - request_at) * 1000).round(4),
