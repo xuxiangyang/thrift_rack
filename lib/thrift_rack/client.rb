@@ -25,7 +25,7 @@ class ThriftRack
           begin
             rpc_id = SecureRandom.uuid
             request_at = Time.now
-            @transport.add_headers({"X-Request-ID" => @request_id, "X-Rpc-ID" => rpc_id, "X-Rpc-Func" => method.to_s})
+            @transport.add_headers({"X-Request-ID" => @request_id, "X-Rpc-ID" => rpc_id, "X-Rpc-Func" => method.to_s, "X-From" => ThriftRack::Client.app_name || "unknown"})
             @client.send(method, *args)
           ensure
             end_time = Time.now
@@ -53,6 +53,10 @@ class ThriftRack
 
     def std_logger
       ::Logger.new(STDOUT)
+    end
+
+    class << self
+      attr_accessor :app_name
     end
   end
 end
