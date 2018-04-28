@@ -1,11 +1,10 @@
-require 'thrift'
 require 'securerandom'
 class ThriftRack
   class Client
     def initialize(url, client_klass, request_id = nil)
       @request_id = request_id || "no-request"
       @url = url
-      @transport = ThriftRack::TransportPool.get(url)
+      @transport = ThriftRack::HttpClientTransport.new(ThriftRack::ExconPool.get(url), URI(url).path)
       protocol = protocol_factory.get_protocol(@transport)
       @client = client_klass.new(protocol)
     end

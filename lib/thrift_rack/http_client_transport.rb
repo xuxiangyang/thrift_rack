@@ -1,15 +1,27 @@
+require 'thrift'
 require 'excon'
 require "stringio"
 Excon.defaults[:ssl_verify_peer] = false
 class ThriftRack
-  class HttpCLientTransport < Thrift::HTTPClientTransport
-    def initialize(url, opts = {})
-      super
-      @client = Excon.new(url, persistent: true)
+  class HttpClientTransport < Thrift::BaseTransport
+    def initialize(client, path, opts = {})
+      @headers = {'Content-Type' => 'application/x-thrift'}
+      @outbuf = Thrift::Bytes.empty_byte_buffer
+      @client = client
+      @path = path
     end
 
+    def open?; true end
+    def read(sz); @inbuf.read sz end
+    def write(buf); @outbuf << Thrift::Bytes.force_binary_encoding(buf) end
+
+    def add_headers(headers)
+      @headers = @headers.merge(headers)
+    end
+
+
     def flush
-      resp = @client.post(body: @outbuf, headers: @headers, idempotent: true)
+      resp = @client.post(path: @path, body: @outbuf, headers: @headers, idempotent: true)
       data = resp.body
       data = Thrift::Bytes.force_binary_encoding(data)
       @inbuf = StringIO.new data
