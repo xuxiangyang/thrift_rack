@@ -2,10 +2,10 @@ require 'thrift'
 require 'securerandom'
 class ThriftRack
   class Client
-    def initialize(url, client_klass, request_id)
+    def initialize(url, client_klass, request_id = nil)
       @request_id = request_id || "no-request"
       @url = url
-      @transport = Thrift::HTTPClientTransport.new(url, ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)
+      @transport = ThriftRack::TransportPool.get(url)
       protocol = protocol_factory.get_protocol(@transport)
       @client = client_klass.new(protocol)
     end
@@ -56,7 +56,15 @@ class ThriftRack
     end
 
     class << self
-      attr_accessor :app_name
+      attr_accessor :app_name, :pool_size, :pool_timeout
+
+      def pool_size
+        @pool_size || 128
+      end
+
+      def pool_timeout
+        @pool_timeout || 3
+      end
     end
   end
 end

@@ -4,6 +4,8 @@ require "thrift_rack/logger"
 require "thrift_rack/client"
 require 'thrift_rack/ping'
 require 'thrift_rack/format_check'
+require 'thrift_rack/http_client_transport'
+require 'thrift_rack/transport_pool'
 
 require 'rack'
 require 'thrift'
