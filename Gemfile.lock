@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    thrift_rack (0.1.7)
+    thrift_rack (0.1.9)
       connection_pool (~> 2.2.1)
       excon (~> 0.62.0)
       rack (>= 2.0)
