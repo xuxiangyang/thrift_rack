@@ -1,7 +1,6 @@
 require 'thrift'
 require "stringio"
 require 'net/http/persistent'
-require 'openssl'
 class ThriftRack
   class HttpClientTransport < Thrift::BaseTransport
     class RespCodeError < StandardError; end
@@ -40,7 +39,7 @@ class ThriftRack
       def default
         return @default if @default
         @default = Net::HTTP::Persistent.new
-        @default.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        @default.verify_mode = 0
         @default
       end
     end

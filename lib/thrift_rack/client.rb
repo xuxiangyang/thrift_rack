@@ -59,7 +59,7 @@ class ThriftRack
 
       def pool_size=(p)
         http = Net::HTTP::Persistent.new(name: self.app_name, pool_size: p)
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        http.verify_mode = 0
         HttpClientTransport.default = http
         @pool_size = p
       end
