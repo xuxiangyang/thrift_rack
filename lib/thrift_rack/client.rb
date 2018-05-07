@@ -55,7 +55,14 @@ class ThriftRack
     end
 
     class << self
-      attr_accessor :app_name
+      attr_accessor :app_name, :pool_size
+
+      def pool_size=(p)
+        http = Net::HTTP::Persistent.new(name: self.app_name, pool_size: p)
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        HttpClientTransport.default = http
+        @pool_size = p
+      end
     end
   end
 end
