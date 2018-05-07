@@ -4,7 +4,7 @@ class ThriftRack
     def initialize(url, client_klass, request_id = nil)
       @request_id = request_id || "no-request"
       @url = url
-      @transport = ThriftRack::HttpClientTransport.new(Excon.new(url), URI(url).path)
+      @transport = ThriftRack::HttpClientTransport.new(url)
       protocol = protocol_factory.get_protocol(@transport)
       @client = client_klass.new(protocol)
     end
@@ -55,15 +55,7 @@ class ThriftRack
     end
 
     class << self
-      attr_accessor :app_name, :pool_size, :pool_timeout
-
-      def pool_size
-        @pool_size || 128
-      end
-
-      def pool_timeout
-        @pool_timeout || 3
-      end
+      attr_accessor :app_name
     end
   end
 end
