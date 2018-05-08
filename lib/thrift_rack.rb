@@ -3,6 +3,7 @@ require "thrift_rack/server"
 require "thrift_rack/logger"
 require "thrift_rack/client"
 require 'thrift_rack/ping'
+require 'thrift_rack/atom'
 require 'thrift_rack/format_check'
 require 'thrift_rack/http_client_transport'
 
@@ -38,6 +39,7 @@ class ThriftRack
     Rack::Builder.new(ThriftRack.new(servers)) do
       use ThriftRack::Ping
       use ThriftRack::FormatCheck
+      use ThriftRack::Atom
       use ThriftRack::Logger
     end
   end
