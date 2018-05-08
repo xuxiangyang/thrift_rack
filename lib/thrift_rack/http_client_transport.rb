@@ -24,13 +24,25 @@ class ThriftRack
       post = Net::HTTP::Post.new uri.path
       post.body = @outbuf
       post.initialize_http_header(@headers)
-      resp = ThriftRack::HttpClientTransport.default.request(uri, post)
+      resp = retry_request_with_503{ThriftRack::HttpClientTransport.default.request(uri, post)}
       data = resp.body
       raise RespCodeError.new("#{resp.code} on #{@url} with body #{data}") unless resp.code.to_i == 200
       data = Thrift::Bytes.force_binary_encoding(data)
       @inbuf = StringIO.new data
     ensure
       @outbuf = Thrift::Bytes.empty_byte_buffer
+    end
+
+    def retry_request_with_503
+      resp = nil
+      3.times do |i|
+        resp = yield
+        if resp.code.to_i != 503
+          return resp
+        end
+        sleep(0.1 * i)
+      end
+      resp
     end
 
     class << self
