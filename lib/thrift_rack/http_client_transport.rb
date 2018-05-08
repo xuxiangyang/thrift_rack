@@ -52,6 +52,7 @@ class ThriftRack
       def default
         return @default if @default
         @default = Net::HTTP::Persistent.new
+        @default.max_requests = 100
         @default.verify_mode = 0
         @default
       end
