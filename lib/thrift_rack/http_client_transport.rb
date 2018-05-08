@@ -4,6 +4,7 @@ require 'net/http/persistent'
 class ThriftRack
   class HttpClientTransport < Thrift::BaseTransport
     class RespCodeError < StandardError; end
+    class ProcessedRequest < StandardError; end
     def initialize(url, opts = {})
       @headers = {'Content-Type' => 'application/x-thrift'}
       @outbuf = Thrift::Bytes.empty_byte_buffer
@@ -26,7 +27,13 @@ class ThriftRack
       post.initialize_http_header(@headers)
       resp = retry_request_with_503{ThriftRack::HttpClientTransport.default.request(uri, post)}
       data = resp.body
-      raise RespCodeError.new("#{resp.code} on #{@url} with body #{data}") unless resp.code.to_i == 200
+      if resp.code.to_i != 200
+        if resp.code.to_i == 409
+          raise ProcessedRequest.new(@url)
+        else
+          raise RespCodeError.new("#{resp.code} on #{@url} with body #{data}")
+        end
+      end
       data = Thrift::Bytes.force_binary_encoding(data)
       @inbuf = StringIO.new data
     ensure
