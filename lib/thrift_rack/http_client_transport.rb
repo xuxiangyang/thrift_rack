@@ -41,6 +41,7 @@ class ThriftRack
           return resp
         end
         sleep(0.1 * i)
+        ThriftRack::HttpClientTransport.default.reconnect
       end
       resp
     end
