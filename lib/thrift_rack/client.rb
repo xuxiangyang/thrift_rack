@@ -59,6 +59,7 @@ class ThriftRack
 
       def pool_size=(p)
         http = Net::HTTP::Persistent.new(name: self.app_name, pool_size: p)
+        http.retry_change_requests = true
         http.max_requests = 100
         http.verify_mode = 0
         HttpClientTransport.default = http
