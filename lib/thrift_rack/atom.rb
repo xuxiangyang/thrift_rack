@@ -7,10 +7,15 @@ class ThriftRack
 
     def call(env)
       req = Rack::Request.new(env)
-      if ThriftRack::Atom.redis.set("thrift_request:#{req.env["HTTP_X_RPC_ID"]}", true, nx: true, ex: 600)
-        @app.call(env)
+      rpc_id = req.env["HTTP_X_RPC_ID"]
+      if rpc_id
+        if ThriftRack::Atom.redis.set("thrift_request:#{rpc_id}", true, nx: true, ex: 600)
+          @app.call(env)
+        else
+          [409, {}, ["RPC Request Processed"]]
+        end
       else
-        [409, {}, ["RPC Request Processed"]]
+        @app.call(env)
       end
     end
 
