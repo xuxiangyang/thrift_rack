@@ -23,6 +23,7 @@ class ThriftRack
 
   def call(env)
     req = Rack::Request.new(env)
+    Thread.current["request"] = req
     server_class = @maps[req.path]
     return Rack::Response.new(["No Thrift Server For #{req.path}"], 404, {'Content-Type' => 'text/plain'}) unless server_class
 
@@ -33,6 +34,8 @@ class ThriftRack
     server_class.processor_class.new(server_class.new).process(protocol, protocol)
 
     resp
+  ensure
+    Thread.current["request"] = nil
   end
 
   def self.app(servers = nil)
