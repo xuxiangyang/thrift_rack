@@ -17,6 +17,10 @@ class ThriftRack
       Thrift::CompactProtocolFactory.new
     end
 
+    def respond_to_missing?(method, include_private = false)
+      @client.respond_to?(method)
+    end
+
     def method_missing(method, *params)
       return super unless @client.respond_to?(method)
       self.class_eval do
