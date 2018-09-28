@@ -42,12 +42,9 @@ class ThriftRack
     end
 
     class << self
+      attr_writer :tag
       def tag
         @tag ||= {}
-      end
-
-      def tag=(**attrs)
-        @tag = attrs
       end
     end
   end
