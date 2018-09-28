@@ -21,6 +21,7 @@ class ThriftRack
         path: req.path,
         func: req.env["HTTP_X_RPC_FUNC"],
         from: req.env["HTTP_X_FROM"],
+        tag: Logger.tag,
       }))
     end
 
@@ -38,6 +39,16 @@ class ThriftRack
 
     def std_logger
       ::Logger.new(STDOUT)
+    end
+
+    class << self
+      def tag
+        @tag ||= {}
+      end
+
+      def tag=(**attrs)
+        @tag = attrs
+      end
     end
   end
 end
