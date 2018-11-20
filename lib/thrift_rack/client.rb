@@ -50,7 +50,6 @@ class ThriftRack
 
     def rails_logger
       file = File.open("#{Rails.root}/log/rpc_client.log", File::WRONLY | File::APPEND | File::CREAT)
-      file.sync = true
       ActiveSupport::Logger.new(file)
     end
 
