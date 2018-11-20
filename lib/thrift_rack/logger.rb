@@ -13,7 +13,7 @@ class ThriftRack
       resp
     ensure
       end_time = Time.now
-      self.logger.info(
+      ThriftRack::Logger.logger.info(
         JSON.dump(
           request_at: request_at.iso8601(6),
           request_id: req.env["HTTP_X_REQUEST_ID"],
