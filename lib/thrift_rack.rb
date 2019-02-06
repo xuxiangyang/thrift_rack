@@ -1,5 +1,6 @@
 require "thrift_rack/version"
 require "thrift_rack/server"
+require 'thrift_rack/sentry'
 require "thrift_rack/logger"
 require "thrift_rack/client"
 require 'thrift_rack/ping'
@@ -44,6 +45,7 @@ class ThriftRack
       use ThriftRack::FormatCheck
       use ThriftRack::Atom
       use ThriftRack::Logger
+      use ThriftRack::Sentry if defined? Raven
     end
   end
 end
