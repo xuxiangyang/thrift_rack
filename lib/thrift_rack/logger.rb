@@ -15,6 +15,7 @@ class ThriftRack
       end_time = Time.now
       ThriftRack::Logger.logger.info(
         JSON.dump(
+          launch_timestamp: req.env["LAUNCH_TIMESTAMP"],
           request_at: request_at.iso8601(6),
           request_id: req.env["HTTP_X_REQUEST_ID"],
           rpc_id: req.env["HTTP_X_RPC_ID"],
