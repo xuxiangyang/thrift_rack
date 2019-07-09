@@ -3,6 +3,7 @@ require "thrift_rack/server"
 require 'thrift_rack/sentry'
 require "thrift_rack/logger"
 require "thrift_rack/client"
+require 'thrift_rack/launch_timestamp'
 require 'thrift_rack/ping'
 require 'thrift_rack/atom'
 require 'thrift_rack/format_check'
@@ -41,6 +42,7 @@ class ThriftRack
 
   def self.app(servers = nil)
     Rack::Builder.new(ThriftRack.new(servers)) do
+      use ThriftRack::LaunchTimestamp
       use ThriftRack::Ping
       use ThriftRack::FormatCheck
       use ThriftRack::Atom

@@ -7,7 +7,7 @@ class ThriftRack
     end
 
     def call(env)
-      request_at = Time.now
+      request_at = env['LAUNCH_AT'] || Time.now
       req = Rack::Request.new(env)
       resp = @app.call(env)
       resp
