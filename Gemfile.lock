@@ -3,7 +3,7 @@ PATH
   specs:
     thrift_rack (0.2.4)
       net-http-persistent (>= 3.0)
-      rack (>= 2.0)
+      rack (>= 2.0.6)
       redis (>= 3.0)
       thrift (~> 0.10.0)
 
@@ -11,16 +11,16 @@ GEM
   remote: https://rubygems.org/
   specs:
     coderay (1.1.2)
-    connection_pool (2.2.1)
+    connection_pool (2.2.2)
     method_source (0.9.0)
-    net-http-persistent (3.0.0)
+    net-http-persistent (3.0.1)
       connection_pool (~> 2.2)
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
-    rack (2.0.5)
+    rack (2.0.7)
     rake (10.5.0)
-    redis (4.0.1)
+    redis (4.1.2)
     thrift (0.10.0.0)
 
 PLATFORMS
@@ -33,4 +33,4 @@ DEPENDENCIES
   thrift_rack!
 
 BUNDLED WITH
-   1.16.1
+   1.16.6
