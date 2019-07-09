@@ -5,7 +5,7 @@ class ThriftRack
     end
 
     def call(env)
-      env['LAUNCH_TIMESTAMP'] = Time.now.iso8601(6)
+      env['LAUNCH_AT'] = Time.now
       @app.call(env)
     end
   end
