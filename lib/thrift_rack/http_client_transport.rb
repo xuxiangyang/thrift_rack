@@ -19,7 +19,6 @@ class ThriftRack
       @headers = @headers.merge(headers)
     end
 
-
     def flush
       uri = URI(@url)
       post = Net::HTTP::Post.new uri.path

@@ -46,8 +46,13 @@ class ThriftRack
     end
 
     class << self
-      attr_accessor :app_name
+      attr_writer :app_name
       attr_reader :pool_size
+
+      def app_name
+        @app_name ||= Rails.application.class.parent.name.underscore if defined? Rails
+        @app_name
+      end
 
       def logger
         @logger ||= if defined? Rails

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    thrift_rack (0.2.4)
+    thrift_rack (0.2.5)
       net-http-persistent (>= 3.0)
       rack (>= 2.0.6)
       redis (>= 3.0)
