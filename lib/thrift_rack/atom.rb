@@ -9,7 +9,10 @@ class ThriftRack
       req = Rack::Request.new(env)
       rpc_id = req.env["HTTP_X_RPC_ID"]
       if rpc_id
-        if ThriftRack::Atom.redis.set("thrift_request:#{rpc_id}", true, nx: true, ex: 600)
+        start_time = Time.now
+        valid = ThriftRack::Atom.redis.set("thrift_request:#{rpc_id}", true, nx: true, ex: 60)
+        if valid
+          env["ATOM_DURATION"] = ((Time.now - start_time) * 1000).round(4)
           @app.call(env)
         else
           [409, {}, ["RPC Request Processed"]]
