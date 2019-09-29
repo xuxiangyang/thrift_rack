@@ -22,7 +22,7 @@ class ThriftRack
         if Kernel.const_defined?(promissory_class_name)
           Kernel.const_get(promissory_class_name)
         else
-          raise "You should overwrite processor_class for #{self.class}"
+          raise "You should overwrite processor_class for #{self}"
         end
       end
 
