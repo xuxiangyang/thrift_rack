@@ -5,9 +5,11 @@ class ThriftRack
   class HttpClientTransport < Thrift::BaseTransport
     class RespCodeError < StandardError; end
     class ProcessedRequest < StandardError; end
+    attr_accessor :response_headers
     def initialize(url, opts = {})
       @headers = {'Content-Type' => 'application/x-thrift'}
       @outbuf = Thrift::Bytes.empty_byte_buffer
+      @response_headers = {}
       @url = url
     end
 
@@ -20,12 +22,14 @@ class ThriftRack
     end
 
     def flush
+      self.response_headers = {}
       uri = URI(@url)
       post = Net::HTTP::Post.new uri.path
       post.body = @outbuf
       post.initialize_http_header(@headers)
       resp = retry_request_with_503{ThriftRack::HttpClientTransport.default.request(uri, post)}
       data = resp.body
+      self.response_headers = resp.header
       if resp.code.to_i != 200
         if resp.code.to_i == 409
           raise ProcessedRequest.new(@url)

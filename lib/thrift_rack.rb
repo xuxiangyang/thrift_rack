@@ -7,6 +7,7 @@ require 'thrift_rack/launch_timestamp'
 require 'thrift_rack/ping'
 require 'thrift_rack/atom'
 require 'thrift_rack/format_check'
+require 'thrift_rack/server_metric'
 require 'thrift_rack/http_client_transport'
 
 require 'rack'
@@ -47,6 +48,7 @@ class ThriftRack
       use ThriftRack::FormatCheck
       use ThriftRack::Atom
       use ThriftRack::Logger
+      use ThriftRack::ServerMetric
       use ThriftRack::Sentry if defined? Raven
     end
   end

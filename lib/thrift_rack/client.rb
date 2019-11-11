@@ -29,14 +29,22 @@ class ThriftRack
             @client.send(method, *args)
           ensure
             end_time = Time.now
+            duration = (end_time - request_at) * 1000
+            process_duration = @transport.response_headers["x-server-process-duration"]&.to_f
             ThriftRack::Client.logger.info(
               JSON.dump(
                 request_at: request_at.iso8601(6),
                 request_id: @request_id,
                 rpc_id: rpc_id,
-                duration: ((end_time - request_at) * 1000).round(4),
+                duration: duration.round(4),
                 path: URI(@url).path,
                 func: method,
+                server: {
+                  id: @transport.response_headers["x-server-id"],
+                  private_ip: @transport.response_headers["x-server-private-ip"],
+                  process_duration: process_duration ? process_duration.round(4) : nil,
+                  network_duration: process_duration ? (duration - process_duration).round(4) : nil,
+                },
               ),
             )
           end
