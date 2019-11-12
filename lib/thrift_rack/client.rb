@@ -39,6 +39,7 @@ class ThriftRack
                 duration: duration.round(4),
                 path: URI(@url).path,
                 func: method,
+                tag: ThriftRack::Client.logger_tag,
                 server: {
                   id: @transport.response_headers["x-server-id"],
                   private_ip: @transport.response_headers["x-server-private-ip"],
@@ -54,12 +55,16 @@ class ThriftRack
     end
 
     class << self
-      attr_writer :app_name
+      attr_writer :app_name, :logger_tag
       attr_reader :pool_size
 
       def app_name
         @app_name ||= Rails.application.class.parent.name.underscore if defined? Rails
         @app_name
+      end
+
+      def logger_tag
+        @logger_tag || {}
       end
 
       def logger
