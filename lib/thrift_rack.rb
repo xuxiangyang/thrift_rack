@@ -9,9 +9,11 @@ require 'thrift_rack/atom'
 require 'thrift_rack/format_check'
 require 'thrift_rack/server_metric'
 require 'thrift_rack/http_client_transport'
+require 'thrift_rack/downgrade'
 
 require 'rack'
 require 'thrift'
+require 'redis'
 
 class ThriftRack
   THRIFT_HEADER = "application/x-thrift"
@@ -40,16 +42,24 @@ class ThriftRack
   ensure
     Thread.current["request"] = nil
   end
+  class << self
+    attr_writer :redis
 
-  def self.app(servers = nil)
-    Rack::Builder.new(ThriftRack.new(servers)) do
-      use ThriftRack::LaunchTimestamp
-      use ThriftRack::Ping
-      use ThriftRack::FormatCheck
-      use ThriftRack::Atom
-      use ThriftRack::Logger
-      use ThriftRack::ServerMetric
-      use ThriftRack::Sentry if defined? Raven
+    def app(servers = nil)
+      Rack::Builder.new(ThriftRack.new(servers)) do
+        use ThriftRack::Downgrade
+        use ThriftRack::LaunchTimestamp
+        use ThriftRack::Ping
+        use ThriftRack::FormatCheck
+        use ThriftRack::Atom
+        use ThriftRack::Logger
+        use ThriftRack::ServerMetric
+        use ThriftRack::Sentry if defined? Raven
+      end
+    end
+
+    def redis
+      @redis ||= Redis.new
     end
   end
 end

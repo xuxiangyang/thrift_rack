@@ -66,7 +66,7 @@ Another config under initializers
 Dir["#{Rails.root}/lib/thrift/**/*.rb"].each { |file| require file } # support generate thrift files under lib/thrift
 Dir["#{Rails.root}/app/servers/*.rb"].each { |file| require file } # support servers under app/servers
 
-ThriftRack::Atom.redis = Redis.new
+ThriftRack.redis = Redis.new
 ThriftRack::Logger.tag = { key: value} # tag to logs
 
 at_exit do
@@ -99,7 +99,7 @@ class Math
   def initialize(request_id = "no-request-id") # web should has one request_id
     @client = ThriftRack::Client.new("http://127.0.0.1:300/math", ThriftClientClass, request_id)
   end
-  
+
   def add(i, j)
     self.client.add(i, j)
   end
@@ -137,9 +137,9 @@ you chould write a supperclass like under, other client inherit superclass
    ```ruby
    class ApplicationController < ActionController::API
      around_action :set_thread_local_request
-   
+
      private
-   
+
      def set_thread_local_request
        Thread.current["request"] = request
        yield
@@ -158,19 +158,19 @@ you chould write a supperclass like under, other client inherit superclass
          @request_id = req.request_id
        end
      end
-   
+
      def request_id
        @request_id ||= Thread.current["request"] ? Thread.current["request"].request_id : "no-request-id"
      end
-   
+
      def client
        ThriftRack::Client.new("http:127.0.0.1:3000/#{_namespace.underscore}", _client_class, request_id)
      end
-   
+
      def respond_to_missing?(method, include_private = false)
        self.client.respond_to?(method)
      end
-   
+
      def method_missing(method, *args)
        return super unless self.client.respond_to?(method)
        self.class_eval do
@@ -180,26 +180,26 @@ you chould write a supperclass like under, other client inherit superclass
        end
        self.public_send(method, *args)
      end
-   
+
      private
-   
+
      def _namespace
        @namespace ||= self.class.name
      end
-   
+
      def _client_class
        "Thrift::#{_namespace}::#{_namespace}Service::Client".constantize
      end
-   
+
      class << self
        def default
          self.new
        end
-   
+
        def respond_to_missing?(method, include_private = false)
          self.default.respond_to?(method)
        end
-   
+
        def method_missing(method, *params)
          return super unless self.default.respond_to?(method)
          define_singleton_method method.to_sym do |*args|

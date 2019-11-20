@@ -1,4 +1,3 @@
-require 'redis'
 class ThriftRack
   class Atom
     def initialize(app)
@@ -10,7 +9,7 @@ class ThriftRack
       rpc_id = req.env["HTTP_X_RPC_ID"]
       if rpc_id
         start_time = Time.now
-        valid = ThriftRack::Atom.redis.set("thrift_request:#{rpc_id}", true, nx: true, ex: 1800)
+        valid = ThriftRack.redis.set("thrift_rack:atom:#{rpc_id}", true, nx: true, ex: 1800)
         if valid
           env["ATOM_DURATION"] = ((Time.now - start_time) * 1000).round(4)
           @app.call(env)
@@ -23,10 +22,9 @@ class ThriftRack
     end
 
     class << self
-      attr_accessor :redis
-
-      def redis
-        @redis ||= Redis.new
+      # compatibility with old version
+      def redis=(r)
+        ThriftRack.redis = r
       end
     end
   end
