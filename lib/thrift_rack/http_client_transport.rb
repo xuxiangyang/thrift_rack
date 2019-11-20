@@ -4,7 +4,7 @@ require 'net/http/persistent'
 class ThriftRack
   class HttpClientTransport < Thrift::BaseTransport
     class RespCodeError < StandardError; end
-    class ProcessedRequest < ProcessedRequest; end
+    class ProcessedRequest < RespCodeError; end
     class ServerDowngradingError < RespCodeError; end
 
     attr_accessor :response_headers
