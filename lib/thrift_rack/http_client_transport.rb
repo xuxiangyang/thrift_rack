@@ -4,7 +4,9 @@ require 'net/http/persistent'
 class ThriftRack
   class HttpClientTransport < Thrift::BaseTransport
     class RespCodeError < StandardError; end
-    class ProcessedRequest < StandardError; end
+    class ProcessedRequest < ProcessedRequest; end
+    class ServerDowngradingError < RespCodeError; end
+
     attr_accessor :response_headers
     def initialize(url, opts = {})
       @headers = {'Content-Type' => 'application/x-thrift'}
@@ -30,11 +32,14 @@ class ThriftRack
       resp = retry_request_with_503{ThriftRack::HttpClientTransport.default.request(uri, post)}
       data = resp.body
       self.response_headers = resp.header
-      if resp.code.to_i != 200
-        if resp.code.to_i == 409
-          raise ProcessedRequest.new(@url)
+      resp_code = resp.code.to_i
+      if resp_code != 200
+        if resp_code == 409
+          raise ProcessedRequest, @url
+        elsif resp_code == 509
+          raise ServerDowngradingError, @url
         else
-          raise RespCodeError.new("#{resp.code} on #{@url} with body #{data}")
+          raise RespCodeError, "#{resp.code} on #{@url} with body #{data}"
         end
       end
       data = Thrift::Bytes.force_binary_encoding(data)
@@ -47,9 +52,8 @@ class ThriftRack
       resp = nil
       3.times do |i|
         resp = yield
-        if resp.code.to_i != 503
-          return resp
-        end
+        return resp unless resp.code.to_i == 503
+
         sleep(0.1 * i)
         ThriftRack::HttpClientTransport.default.reconnect
       end
