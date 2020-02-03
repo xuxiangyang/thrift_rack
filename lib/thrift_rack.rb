@@ -30,7 +30,7 @@ class ThriftRack
     req = Rack::Request.new(env)
     Thread.current["request"] = req
     server_class = @maps[req.path]
-    return Rack::Response.new(["No Thrift Server For #{req.path}"], 404, {'Content-Type' => 'text/plain'}) unless server_class
+    return ["No Thrift Server For #{req.path}"], 404, {'Content-Type' => 'text/plain'} unless server_class
 
     resp = Rack::Response.new([], 200, {'Content-Type' => THRIFT_HEADER})
 
@@ -38,7 +38,7 @@ class ThriftRack
     protocol = server_class.protocol_factory.get_protocol transport
     server_class.processor_class.new(server_class.new).process(protocol, protocol)
 
-    resp
+    resp.to_a
   ensure
     Thread.current["request"] = nil
   end

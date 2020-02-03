@@ -6,7 +6,7 @@ class ThriftRack
 
     def call(env)
       req = Rack::Request.new(env)
-      return Rack::Response.new(["PONG"], 200, {'Content-Type' => 'text/plain'}) if req.path == "/ping"
+      return ["PONG"], 200, {'Content-Type' => 'text/plain'} if req.path == "/ping"
       @app.call(env)
     end
   end
