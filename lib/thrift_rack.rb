@@ -30,7 +30,7 @@ class ThriftRack
     req = Rack::Request.new(env)
     Thread.current["request"] = req
     server_class = @maps[req.path]
-    return ["No Thrift Server For #{req.path}"], 404, {'Content-Type' => 'text/plain'} unless server_class
+    return 400, {'Content-Type' => 'text/plain'}, ["No Thrift Server For #{req.path}"]  unless server_class
 
     resp = Rack::Response.new([], 200, {'Content-Type' => THRIFT_HEADER})
 
