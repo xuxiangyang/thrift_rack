@@ -36,7 +36,7 @@ class ThriftRack
 
     transport = Thrift::IOStreamTransport.new req.body, resp
     protocol = server_class.protocol_factory.get_protocol transport
-    server_class.processor_class.new(server_class.new).process(protocol, protocol)
+    server_class.processor_class.new(server_class.new(req)).process(protocol, protocol)
 
     resp.to_a
   ensure

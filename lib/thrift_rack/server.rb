@@ -1,5 +1,9 @@
 class ThriftRack
   class Server
+    def initialize(request)
+      @_request = request
+    end
+
     class << self
       def inherited(subclass)
         warn "Your class should end with Server not it is #{subclass}" unless subclass.name.end_with?("Server")
