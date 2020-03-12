@@ -1,7 +1,7 @@
 class ThriftRack
   class Server
     def initialize(request = nil)
-      @_request = request = nil
+      @_request = request
     end
 
     class << self
