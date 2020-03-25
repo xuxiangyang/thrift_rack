@@ -64,12 +64,15 @@ class ThriftRack
       attr_accessor :default
 
       def default
-        return @default if @default
-        @default = Net::HTTP::Persistent.new
-        @default.retry_change_requests = true
-        @default.max_requests = 100
-        @default.verify_mode = 0
-        @default
+        @default ||= new_http
+      end
+
+      def new_http(name, max_requests: 100)
+        http = Net::HTTP::Persistent.new(name)
+        http.retry_change_requests = true
+        http.max_requests = max_requests
+        http.verify_mode = 0
+        http
       end
     end
   end
