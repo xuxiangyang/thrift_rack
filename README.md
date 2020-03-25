@@ -112,12 +112,7 @@ Another config under initializers
 #initializers/thrift.rb
 Dir["#{Rails.root}/lib/thrift/**/*.rb"].each { |file| require file }
 
-ThriftRack::Client.app_name = Rails.application.class.parent.name.underscore
-ThriftRack::Client.pool_size = DEFAULT_THRIFT_POOL_SIZE
-
-at_exit do
-  ThriftRack::Client.logger.close
-end
+ThriftRack::Client.config Rails.application.class.parent.name.underscore
 ```
 
 what happend?
@@ -244,4 +239,3 @@ The gem is available as open source under the terms of the [MIT License](https:/
 ## Code of Conduct
 
 Everyone interacting in the ThriftRack project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/thrift_rack/blob/master/CODE_OF_CONDUCT.md).
-

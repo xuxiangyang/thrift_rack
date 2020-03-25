@@ -56,7 +56,6 @@ class ThriftRack
 
     class << self
       attr_writer :app_name, :logger_tag
-      attr_reader :pool_size
 
       def app_name
         @app_name ||= Rails.application.class.parent.name.underscore if defined? Rails
@@ -75,13 +74,13 @@ class ThriftRack
                     end
       end
 
-      def pool_size=(p)
-        http = Net::HTTP::Persistent.new(name: self.app_name, pool_size: p)
-        http.retry_change_requests = true
-        http.max_requests = 100
-        http.verify_mode = 0
-        HttpClientTransport.default = http
-        @pool_size = p
+      def config(app_name, max_requests: 100, logger_tag: {})
+        self.app_name = app_name
+        self.logger_tag = logger_tag
+        HttpClientTransport.default = HttpClientTransport.new_http(app_name, max_requests: max_requests)
+        at_exit do
+          ThriftRack::Client.logger.close
+        end
       end
     end
   end

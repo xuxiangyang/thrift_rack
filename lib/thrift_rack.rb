@@ -30,15 +30,16 @@ class ThriftRack
     req = Rack::Request.new(env)
     Thread.current["request"] = req
     server_class = @maps[req.path]
-    return Rack::Response.new(["No Thrift Server For #{req.path}"], 404, {'Content-Type' => 'text/plain'}) unless server_class
+    return 400, {'Content-Type' => 'text/plain'}, ["No Thrift Server For #{req.path}"]  unless server_class
 
     resp = Rack::Response.new([], 200, {'Content-Type' => THRIFT_HEADER})
 
     transport = Thrift::IOStreamTransport.new req.body, resp
     protocol = server_class.protocol_factory.get_protocol transport
-    server_class.processor_class.new(server_class.new).process(protocol, protocol)
+    server_class.processor_class.new(server_class.new(req)).process(protocol, protocol)
 
-    resp
+    resp_a = resp.to_a
+    [resp_a[0], resp_a[1], [resp_a[2].join]]
   ensure
     Thread.current["request"] = nil
   end
