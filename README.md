@@ -112,8 +112,7 @@ Another config under initializers
 #initializers/thrift.rb
 Dir["#{Rails.root}/lib/thrift/**/*.rb"].each { |file| require file }
 
-ThriftRack::Client.app_name = Rails.application.class.parent.name.underscore
-ThriftRack::Client.pool_size = DEFAULT_THRIFT_POOL_SIZE
+ThriftRack::Client.config Rails.application.class.parent.name.underscore
 
 at_exit do
   ThriftRack::Client.logger.close
