@@ -79,6 +79,9 @@ class ThriftRack
         self.logger_tag = logger_tag
         HttpClientTransport.default.max_requests = max_requests
         HttpClientTransport.default.name = app_name
+        at_exit do
+          ThriftRack::Client.logger.close
+        end
       end
     end
   end
