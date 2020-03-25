@@ -77,7 +77,7 @@ class ThriftRack
       def config(app_name, max_requests: 100, logger_tag: {})
         self.app_name = app_name
         self.logger_tag = logger_tag
-        HttpClientTransport.default = HttpClientTransport.new_http(name, max_requests)
+        HttpClientTransport.default = HttpClientTransport.new_http(name, max_requests: max_requests)
         at_exit do
           ThriftRack::Client.logger.close
         end
