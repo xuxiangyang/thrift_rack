@@ -68,7 +68,7 @@ class ThriftRack
       end
 
       def new_http(name, max_requests: 100)
-        http = Net::HTTP::Persistent.new(name)
+        http = Net::HTTP::Persistent.new(name: name)
         http.retry_change_requests = true
         http.max_requests = max_requests
         http.verify_mode = 0
