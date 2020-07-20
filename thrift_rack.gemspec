@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "rack", ">= 2.0.6"
-  spec.add_dependency "thrift", '~> 0.10.0'
+  spec.add_dependency "thrift", '~> 0.10'
   spec.add_dependency 'net-http-persistent', ">= 3.0"
   spec.add_dependency 'redis', '>=3.0'
 
