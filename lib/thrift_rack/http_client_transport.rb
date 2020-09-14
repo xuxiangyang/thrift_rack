@@ -64,7 +64,7 @@ class ThriftRack
       attr_accessor :default
 
       def default
-        @default ||= new_http
+        @default ||= new_http(ThriftRack::Client.app_name || "default")
       end
 
       def new_http(name, max_requests: 100)
