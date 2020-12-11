@@ -1,8 +1,9 @@
 require 'securerandom'
 class ThriftRack
   class Client
+    DEFAULT_REQUEST_ID = "no-request".freeze
     def initialize(url, client_klass, request_id = nil)
-      @request_id = request_id || "no-request"
+      @request_id = request_id || DEFAULT_REQUEST_ID
       @url = url
       @transport = ThriftRack::HttpClientTransport.new(url)
       protocol = protocol_factory.get_protocol(@transport)
@@ -31,23 +32,25 @@ class ThriftRack
             end_time = Time.now
             duration = (end_time - request_at) * 1000
             process_duration = @transport.response_headers["x-server-process-duration"]&.to_f
-            ThriftRack::Client.logger.info(
-              JSON.dump(
-                request_at: request_at.iso8601(6),
-                request_id: @request_id,
-                rpc_id: rpc_id,
-                duration: duration.round(4),
-                path: URI(@url).path,
-                func: method,
-                tag: ThriftRack::Client.logger_tag,
-                server: {
-                  id: @transport.response_headers["x-server-id"],
-                  private_ip: @transport.response_headers["x-server-private-ip"],
-                  process_duration: process_duration ? process_duration.round(4) : nil,
-                  network_duration: process_duration ? (duration - process_duration).round(4) : nil,
-                },
-              ),
-            )
+            if @request_id == DEFAULT_REQUEST_ID || @request_id.hash % 8 == 0 || duration >= 100
+              ThriftRack::Client.logger.info(
+                JSON.dump(
+                  request_at: request_at.iso8601(6),
+                  request_id: @request_id,
+                  rpc_id: rpc_id,
+                  duration: duration.round(4),
+                  path: URI(@url).path,
+                  func: method,
+                  tag: ThriftRack::Client.logger_tag,
+                  server: {
+                    id: @transport.response_headers["x-server-id"],
+                    private_ip: @transport.response_headers["x-server-private-ip"],
+                    process_duration: process_duration ? process_duration.round(4) : nil,
+                    network_duration: process_duration ? (duration - process_duration).round(4) : nil,
+                  },
+                ),
+              )
+            end
           end
         end
       end

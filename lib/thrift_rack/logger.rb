@@ -12,20 +12,23 @@ class ThriftRack
       resp = @app.call(env)
       resp
     ensure
-      end_time = Time.now
-      ThriftRack::Logger.logger.info(
-        JSON.dump(
-          request_at: request_at.iso8601(6),
-          request_id: req.env["HTTP_X_REQUEST_ID"],
-          rpc_id: req.env["HTTP_X_RPC_ID"],
-          duration: ((end_time - request_at) * 1000).round(4),
-          atom_duration: env["ATOM_DURATION"],
-          path: req.path,
-          func: req.env["HTTP_X_RPC_FUNC"],
-          from: req.env["HTTP_X_FROM"],
-          tag: Logger.tag,
-        ),
-      )
+      duration = ((Time.now - request_at) * 1000).round(4)
+      request_id = req.env["HTTP_X_REQUEST_ID"]
+      if request_id == ThriftRack::Client::DEFAULT_REQUEST_ID || @request_id.hash % 8 == 0 || duration >= 100
+        ThriftRack::Logger.logger.info(
+          JSON.dump(
+            request_at: request_at.iso8601(6),
+            request_id: request_id,
+            rpc_id: req.env["HTTP_X_RPC_ID"],
+            duration: duration,
+            atom_duration: env["ATOM_DURATION"],
+            path: req.path,
+            func: req.env["HTTP_X_RPC_FUNC"],
+            from: req.env["HTTP_X_FROM"],
+            tag: Logger.tag,
+          ),
+        )
+      end
     end
 
     class << self
