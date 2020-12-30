@@ -26,7 +26,7 @@ class ThriftRack
           begin
             rpc_id = SecureRandom.uuid
             request_at = Time.now
-            @transport.add_headers("X-Request-ID" => @request_id, "X-Rpc-ID" => rpc_id, "X-Rpc-Func" => method.to_s, "X-From" => ThriftRack::Client.app_name || "unknown", "X-Full-Trace" => Thread.current["RPC_FULL_TRACE"])
+            @transport.add_headers("X-Request-ID" => @request_id, "X-Rpc-ID" => rpc_id, "X-Rpc-Func" => method.to_s, "X-From" => ThriftRack::Client.app_name || "unknown", "X-Full-Trace" => Thread.current["RPC_FULL_TRACE"].to_s)
             @client.send(method, *args)
           ensure
             end_time = Time.now
