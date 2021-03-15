@@ -27,6 +27,18 @@ class ThriftRack
   end
 
   def call(env)
+    if ThriftRack.in_rails?
+      ::Rails.application.reloader.wrap do
+        _call(env)
+      end
+    else
+      _call(env)
+    end
+  end
+
+  private
+
+  def _call(env)
     req = Rack::Request.new(env)
     Thread.current["request"] = req
     server_class = @maps[req.path]
@@ -61,6 +73,14 @@ class ThriftRack
 
     def redis
       @redis ||= Redis.new
+    end
+
+    def in_rails?
+      if @in_rails.nil?
+        @in_rails = defined?(::Rails)
+      else
+        @in_rails
+      end
     end
   end
 end
