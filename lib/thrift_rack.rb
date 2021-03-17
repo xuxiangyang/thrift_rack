@@ -39,7 +39,7 @@ class ThriftRack
     server_class.processor_class.new(server_class.new(req)).process(protocol, protocol)
 
     resp_a = resp.to_a
-    [resp_a[0], resp_a[1], resp_a[2].join]
+    [resp_a[0], resp_a[1], [resp_a[2].join]]
   ensure
     Thread.current["request"] = nil
   end
