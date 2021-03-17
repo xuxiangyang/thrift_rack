@@ -27,18 +27,6 @@ class ThriftRack
   end
 
   def call(env)
-    if ThriftRack.in_rails?
-      ::Rails.application.reloader.wrap do
-        _call(env)
-      end
-    else
-      _call(env)
-    end
-  end
-
-  private
-
-  def _call(env)
     req = Rack::Request.new(env)
     Thread.current["request"] = req
     server_class = @maps[req.path]
@@ -51,7 +39,7 @@ class ThriftRack
     server_class.processor_class.new(server_class.new(req)).process(protocol, protocol)
 
     resp_a = resp.to_a
-    [resp_a[0], resp_a[1], [[resp_a[2]].flatten.join]]
+    [resp_a[0], resp_a[1], resp_a[2].join]
   ensure
     Thread.current["request"] = nil
   end
@@ -60,6 +48,7 @@ class ThriftRack
 
     def app(servers = nil)
       Rack::Builder.new(ThriftRack.new(servers)) do
+        use(ActionDispatch::Executor, ::Rails.application.executor) if defined? ::Rails
         use ThriftRack::Downgrade
         use ThriftRack::LaunchTimestamp
         use ThriftRack::Ping
@@ -73,14 +62,6 @@ class ThriftRack
 
     def redis
       @redis ||= Redis.new
-    end
-
-    def in_rails?
-      if @in_rails.nil?
-        @in_rails = defined?(::Rails)
-      else
-        @in_rails
-      end
     end
   end
 end
