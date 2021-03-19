@@ -26,13 +26,18 @@ class ThriftRack
           begin
             rpc_id = SecureRandom.uuid
             request_at = Time.now
-            @transport.add_headers("X-Request-ID" => @request_id, "X-Rpc-ID" => rpc_id, "X-Rpc-Func" => method.to_s, "X-From" => ThriftRack::Client.app_name || "unknown", "X-Full-Trace" => Thread.current["RPC_FULL_TRACE"].to_s)
+            if Thread.current["RPC_FULL_TRACE"] == "true"
+              full_trace = true
+            else
+              full_trace = @request_id == DEFAULT_REQUEST_ID || @request_id.hash % 8 == 0
+            end
+            @transport.add_headers("X-Request-ID" => @request_id, "X-Rpc-ID" => rpc_id, "X-Rpc-Func" => method.to_s, "X-From" => ThriftRack::Client.app_name || "unknown", "X-Full-Trace" => full_trace)
             @client.send(method, *args)
           ensure
             end_time = Time.now
             duration = (end_time - request_at) * 1000
             process_duration = @transport.response_headers["x-server-process-duration"]&.to_f
-            if @request_id == DEFAULT_REQUEST_ID || @request_id.hash % 8 == 0 || duration >= 100
+            if full_tace || duration >= 100
               ThriftRack::Client.logger.info(
                 JSON.dump(
                   request_at: request_at.iso8601(6),
@@ -42,6 +47,7 @@ class ThriftRack
                   path: URI(@url).path,
                   func: method,
                   tag: ThriftRack::Client.logger_tag,
+                  full_trace: full_trace,
                   server: {
                     id: @transport.response_headers["x-server-id"],
                     private_ip: @transport.response_headers["x-server-private-ip"],

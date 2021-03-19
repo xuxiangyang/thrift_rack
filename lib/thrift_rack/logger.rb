@@ -14,7 +14,8 @@ class ThriftRack
     ensure
       duration = ((Time.now - request_at) * 1000).round(4)
       request_id = req.env["HTTP_X_REQUEST_ID"]
-      if request_id == ThriftRack::Client::DEFAULT_REQUEST_ID || @request_id.hash % 8 == 0 || duration >= 100 || req.env["HTTP_X_FULL_TRACE"] == "true"
+      full_trace = req.env["HTTP_X_FULL_TRACE"] == "true"
+      if full_trace || duration >= 100
         ThriftRack::Logger.logger.info(
           JSON.dump(
             request_at: request_at.iso8601(6),
@@ -25,6 +26,7 @@ class ThriftRack
             path: req.path,
             func: req.env["HTTP_X_RPC_FUNC"],
             from: req.env["HTTP_X_FROM"],
+            full_trace: full_trace,
             tag: Logger.tag,
           ),
         )
