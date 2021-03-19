@@ -14,7 +14,11 @@ class ThriftRack
     ensure
       duration = ((Time.now - request_at) * 1000).round(4)
       request_id = req.env["HTTP_X_REQUEST_ID"]
-      full_trace = req.env["HTTP_X_FULL_TRACE"] == "true"
+      if req.env["HTTP_X_FULL_TRACE"]
+        full_trace = req.env["HTTP_X_FULL_TRACE"] == "true"
+      else
+        full_trace = request_id.hash % 8 == 0
+      end
       if full_trace || duration >= 100
         ThriftRack::Logger.logger.info(
           JSON.dump(

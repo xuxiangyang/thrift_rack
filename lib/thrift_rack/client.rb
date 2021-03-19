@@ -31,7 +31,7 @@ class ThriftRack
             else
               full_trace = @request_id == DEFAULT_REQUEST_ID || @request_id.hash % 8 == 0
             end
-            @transport.add_headers("X-Request-ID" => @request_id, "X-Rpc-ID" => rpc_id, "X-Rpc-Func" => method.to_s, "X-From" => ThriftRack::Client.app_name || "unknown", "X-Full-Trace" => full_trace)
+            @transport.add_headers("X-Request-ID" => @request_id, "X-Rpc-ID" => rpc_id, "X-Rpc-Func" => method.to_s, "X-From" => ThriftRack::Client.app_name || "unknown", "X-Full-Trace" => full_trace.to_s)
             @client.send(method, *args)
           ensure
             end_time = Time.now
