@@ -37,7 +37,7 @@ class ThriftRack
             end_time = Time.now
             duration = (end_time - request_at) * 1000
             process_duration = @transport.response_headers["x-server-process-duration"]&.to_f
-            if full_tace || duration >= 100
+            if full_trace || duration >= 100
               ThriftRack::Client.logger.info(
                 JSON.dump(
                   request_at: request_at.iso8601(6),
