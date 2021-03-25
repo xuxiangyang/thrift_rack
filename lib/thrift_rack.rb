@@ -16,7 +16,7 @@ require 'thrift'
 require 'redis'
 
 class ThriftRack
-  THRIFT_HEADER = "application/x-thrift"
+  THRIFT_HEADER = "application/x-thrift".freeze
 
   def initialize(servers = nil)
     servers ||= ThriftRack::Server.children
@@ -48,15 +48,15 @@ class ThriftRack
 
     def app(servers = nil)
       Rack::Builder.new(ThriftRack.new(servers)) do
+        use ThriftRack::LaunchTimestamp
         use(ActionDispatch::Executor, ::Rails.application.executor) if defined? ::Rails
         use ThriftRack::Downgrade
-        use ThriftRack::LaunchTimestamp
         use ThriftRack::Ping
         use ThriftRack::FormatCheck
         use ThriftRack::Atom
         use ThriftRack::Logger
-        use ThriftRack::ServerMetric
         use ThriftRack::Sentry if defined? Raven
+        use ThriftRack::ServerMetric
       end
     end
 

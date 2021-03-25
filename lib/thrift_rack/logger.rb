@@ -8,6 +8,7 @@ class ThriftRack
 
     def call(env)
       request_at = env['LAUNCH_AT'] || Time.now
+      income_middleware_duration = Time.now - request_at
       req = Rack::Request.new(env)
       resp = @app.call(env)
       resp
@@ -26,6 +27,7 @@ class ThriftRack
             request_id: request_id,
             rpc_id: req.env["HTTP_X_RPC_ID"],
             duration: duration,
+            income_middleware_duration: (income_middleware_duration * 1000).to_s,
             atom_duration: env["ATOM_DURATION"],
             path: req.path,
             func: req.env["HTTP_X_RPC_FUNC"],
