@@ -27,7 +27,7 @@ class ThriftRack
             request_id: request_id,
             rpc_id: req.env["HTTP_X_RPC_ID"],
             duration: duration,
-            income_middleware_duration: (income_middleware_duration * 1000).to_s,
+            income_middleware_duration: (income_middleware_duration * 1000).round(2),
             atom_duration: env["ATOM_DURATION"],
             path: req.path,
             func: req.env["HTTP_X_RPC_FUNC"],
